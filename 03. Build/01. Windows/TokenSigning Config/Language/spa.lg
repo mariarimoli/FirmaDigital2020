@@ -1,0 +1,42 @@
+﻿LANGUAGE=English
+#---------------------------------------------------------------------
+# Config install
+#---------------------------------------------------------------------
+WARNING_CAPTION=Warning
+CLOSE_BROWSER=You need to close browsers to continue. Click OK to close browsers.
+WARNING_INSTALL_FALIED=Failed to configure software certificate! Reinstall the software!
+COMMON_DIALOG_TITLE=Info
+#---------------------------------------------------------------------
+# Choose Certificate
+#---------------------------------------------------------------------
+CERT_DIALOG_REQUEST=Choose your certificate:
+CERT_DIALOG_CAPTION=Certificates List
+#---------------------------------------------------------------------
+# PIN DIALOG
+#---------------------------------------------------------------------
+PIN_DIALOG_TITLE=PIN Authentication
+PIN_DIALOG_LABEL=Enter PIN:
+PIN_DIALOG_ALERT_CONTENT=Input PIN
+PIN_DIALOG_WARNING_INVALID_SIZE=PIN length invalid!
+PIN_DIALOG_WARNING_INCORRECT=PIN Incorrect!
+PIN_DIALOG_WARNING_LOCK=The usb token has locked!
+PIN_DIALOG_WARNING_MAX_INPUT=You have entered incorrect pin too many times!
+#---------------------------------------------------------------------
+# SYSTEM TRAY
+#---------------------------------------------------------------------
+SYSTEM_TRAY_MENU_INFO=Information
+SYSTEM_TRAY_MENU_CLOSE=Close
+SYSTEM_TRAY_MENU_LANGUAGE=Language
+SYSTEM_TRAY_VERSION=TokenSigning. Version 
+SYSTEM_TRAY_WARNING_CLOSE=You need to re-open the software to sign on your webstie! Force close?
+SYSTEM_TRAY_RUNNING=running
+#---------------------------------------------------------------------
+# FIREFOX
+#---------------------------------------------------------------------
+CLOSE_FIREFOX=You need to close Firefox browser. Click OK to close.
+#---------------------------------------------------------------------
+# LANGUAGE
+#---------------------------------------------------------------------
+LANGUAGE_DIALOG=Language
+LANGUAGE_DIALOG_REQUEST=Choose language:
+LANGUAGE_DIALOG_CAPTION=Language

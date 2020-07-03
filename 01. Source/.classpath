@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="testFunction"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="I:/WORK/My-Github/TokenSigning/01. Source/lib/bcpkix-jdk15on-1.49.jar"/>
+	<classpathentry kind="lib" path="I:/WORK/My-Github/TokenSigning/01. Source/lib/bcprov-jdk15on-1.49.jar"/>
+	<classpathentry kind="lib" path="I:/WORK/My-Github/TokenSigning/01. Source/lib/cesecore-common-6.1.1.jar"/>
+	<classpathentry kind="lib" path="I:/WORK/My-Github/TokenSigning/01. Source/lib/cesecore-ejb-6.1.1.jar"/>
+	<classpathentry kind="lib" path="I:/WORK/My-Github/TokenSigning/01. Source/lib/cesecore-ejb-interface-6.1.1.jar"/>
+	<classpathentry kind="lib" path="I:/WORK/My-Github/TokenSigning/01. Source/lib/cesecore-entity-6.1.1.jar"/>
+	<classpathentry kind="lib" path="I:/WORK/My-Github/TokenSigning/01. Source/lib/commons-collections-3.2.jar"/>
+	<classpathentry kind="lib" path="I:/WORK/My-Github/TokenSigning/01. Source/lib/commons-configuration-1.6.jar"/>
+	<classpathentry kind="lib" path="I:/WORK/My-Github/TokenSigning/01. Source/lib/commons-io-2.5.jar"/>
+	<classpathentry kind="lib" path="I:/WORK/My-Github/TokenSigning/01. Source/lib/commons-lang-2.5.jar"/>
+	<classpathentry kind="lib" path="I:/WORK/My-Github/TokenSigning/01. Source/lib/commons-logging-1.1.1.jar"/>
+	<classpathentry kind="lib" path="I:/WORK/My-Github/TokenSigning/01. Source/lib/dom4j-1.6.1.jar"/>
+	<classpathentry kind="lib" path="I:/WORK/My-Github/TokenSigning/01. Source/lib/gson-2.2.1.jar"/>
+	<classpathentry kind="lib" path="I:/WORK/My-Github/TokenSigning/01. Source/lib/iText.jar"/>
+	<classpathentry kind="lib" path="I:/WORK/My-Github/TokenSigning/01. Source/lib/iText_old.jar"/>
+	<classpathentry kind="lib" path="I:/WORK/My-Github/TokenSigning/01. Source/lib/jaxen-1.1.jar"/>
+	<classpathentry kind="lib" path="I:/WORK/My-Github/TokenSigning/01. Source/lib/jetty-all-9.4.7.v20170914-uber.jar"/>
+	<classpathentry kind="lib" path="I:/WORK/My-Github/TokenSigning/01. Source/lib/log4j-1.2.14.jar"/>
+	<classpathentry kind="lib" path="I:/WORK/My-Github/TokenSigning/01. Source/lib/OpenXML4J.jar"/>
+	<classpathentry kind="lib" path="I:/WORK/My-Github/TokenSigning/01. Source/lib/serializer-2.7.1.jar"/>
+	<classpathentry kind="lib" path="I:/WORK/My-Github/TokenSigning/01. Source/lib/xalan-2.7.1.jar"/>
+	<classpathentry kind="lib" path="I:/WORK/My-Github/TokenSigning/01. Source/lib/xercesImpl-2.9.1.jar"/>
+	<classpathentry kind="lib" path="I:/WORK/My-Github/TokenSigning/01. Source/lib/xml-apis.jar"/>
+	<classpathentry kind="lib" path="I:/WORK/My-Github/TokenSigning/01. Source/lib/xmldsig.jar"/>
+	<classpathentry kind="lib" path="I:/WORK/My-Github/TokenSigning/01. Source/lib/xmlsec-1.5.7.jar"/>
+	<classpathentry kind="lib" path="I:/WORK/My-Github/TokenSigning/01. Source/CertificateHandle_CSharp/Lib built/jni4net.j-0.8.8.0.jar"/>
+	<classpathentry kind="lib" path="I:/WORK/My-Github/TokenSigning/01. Source/CertificateHandle_CSharp/Lib built/CertificateUtils.j4n.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

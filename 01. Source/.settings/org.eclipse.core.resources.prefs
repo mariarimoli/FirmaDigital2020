@@ -1,0 +1,15 @@
+eclipse.preferences.version=1
+encoding//src/com/tokensigning/configuraion/Configuration.java=UTF-8
+encoding//src/com/tokensigning/form/CertificateChooser.java=UTF-8
+encoding//src/com/tokensigning/form/LanguageForm.java=UTF-8
+encoding//src/com/tokensigning/form/PINVerification.java=UTF-8
+encoding//src/com/tokensigning/form/SystemTrayEvent.java=UTF-8
+encoding//src/com/tokensigning/server/EventProcessing.java=UTF-8
+encoding//src/com/tokensigning/server/EventServer.java=UTF-8
+encoding//src/com/tokensigning/server/EventSocket.java=UTF-8
+encoding//src/com/tokensigning/signature/Pdf.java=UTF-8
+encoding//src/com/tokensigning/token/CertificateHandle.java=UTF-8
+encoding//src/com/tokensigning/token/PKCS11CryptoToken.java=UTF-8
+encoding//src/com/tokensigning/utils/LanguageOption.java=UTF-8
+encoding//src/com/tokensigning/utils/Utils.java=UTF-8
+encoding//testFunction/test.java=UTF-8
