@@ -32,12 +32,22 @@ import com.tokensigning.token.IKeystoreBase;
 import com.tokensigning.token.PKCS11CryptoToken;
 import com.tokensigning.token.WindowsKeystore;
 import com.tokensigning.utils.Utils;
-
+/**
+* Cms: handle sign text
+*
+* @author  Tuan
+* @version 1.0
+* @since   2020-07-12 
+*/
 public class Cms {
 	private CertificateHandle handle = new CertificateHandle();
 	private String pkcs11Provider = null;
 	
-	
+	/**
+     * Constructor
+     *
+     * @param hadle is instance for certificate handle: get cert, key,... 
+     */
 	public Cms(CertificateHandle handle) {
 		super();
 		Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
@@ -47,12 +57,22 @@ public class Cms {
 			this.handle = new CertificateHandle();
 		}
 	}
-	
+	/**
+     * Constructor
+     */
 	public Cms() {
 		super();
 		Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
 	}
 	
+	
+	/**
+     * Sign hash
+     *
+     * @param data is hash (sha1, sha256)
+     * @param sigOption is signature options
+     * @return result
+     */
 	public SigningResult signHash(byte[] data, SignatureOption sigOption) {
 		SigningResult sigResult = new SigningResult();
 		try {		
@@ -63,7 +83,7 @@ public class Cms {
 				String serialNumber = null;
 				if (sigOption == null || sigOption.getCertificateSerial() == null)
 				{
-					serialNumber = CertificateChooser.show(token.getAllCertificateInfo());
+					serialNumber = CertificateChooser.show(token.getAllCertInfoFromUserstore());
 				}
 				else
 				{
@@ -91,6 +111,15 @@ public class Cms {
 		}
 		return sigResult;
 	}
+	
+	/**
+     * Sign hash
+     *
+     * @param privKey is PrivateKey to sign
+     * @param data is hash (sha1, sha256)
+     * @param sigOption is signature options
+     * @return result
+     */
 	public SigningResult signHash(PrivateKey privKey, byte[] data, SignatureOption sigOption) {
 		SigningResult result = new SigningResult();
 		try {			
@@ -112,10 +141,6 @@ public class Cms {
 			@SuppressWarnings("deprecation")
 			AlgorithmIdentifier sha1aid_ = new AlgorithmIdentifier(shaoid_, null);
 			DigestInfo di = new DigestInfo(sha1aid_, data);
-//			Cipher cipher2;
-//			cipher2 = Cipher.getInstance("RSA/ECB/PKCS1Padding",
-//					new BouncyCastleProvider());
-//			cipher2.init(Cipher.ENCRYPT_MODE, privKey);
 			Cipher cipher2 = Cipher.getInstance("RSA/ECB/PKCS1Padding");
             cipher2.init(Cipher.ENCRYPT_MODE, privKey);
 			byte[] signed = cipher2.doFinal(di.getEncoded());
@@ -129,6 +154,14 @@ public class Cms {
 		result.setSigResult(SIGNING_RESULT.sigSigningFailed);
 		return result;
 	}
+	
+	/**
+     * Sign text, string
+     *
+     * @param data is text, string
+     * @param sigOption is signature options
+     * @return result
+     */
 	public SigningResult sign(byte[] data, SignatureOption sigOption) {
 		SigningResult sigResult = new SigningResult();
 		if (data == null)
@@ -154,7 +187,7 @@ public class Cms {
 				String serialNumber = null;
 				if (sigOption == null || sigOption.getCertificateSerial() == null || sigOption.getCertificateSerial().isEmpty())
 				{
-					serialNumber = CertificateChooser.show(token.getAllCertificateInfo());
+					serialNumber = CertificateChooser.show(token.getAllCertInfoFromUserstore());
 				}
 				else
 				{
@@ -185,6 +218,16 @@ public class Cms {
 		}
 		return sigResult;
 	}
+	
+	/**
+     * Sign text, string
+     *
+     * @param certs is signer's certificates chain
+     * @param privKey is PrivateKey to sign
+     * @param data is text, string
+     * @param sigOption is signature options
+     * @return result
+     */
 	public SigningResult sign(Certificate[] certs, PrivateKey privKey, byte[] data, SignatureOption sigOption) {
 		SigningResult result = new SigningResult();
 		
@@ -195,10 +238,6 @@ public class Cms {
 				sigOption = new SignatureOption();
 			}
 
-            
-//			JcaSignerInfoGeneratorBuilder sigBuilder  = new JcaSignerInfoGeneratorBuilder(new JcaDigestCalculatorProviderBuilder().setProvider("BC").build());
-//			SignerInfoGenerator signerInfoGen = sigBuilder.build(new JcaContentSignerBuilder(sigOption.getSignatureMethod()).build(privKey), (X509Certificate) certs[0]);
-//			generator.addSignerInfoGenerator(signerInfoGen);
 			if (pkcs11Provider == null || pkcs11Provider.isEmpty())
 			{
 				pkcs11Provider = BouncyCastleProvider.PROVIDER_NAME;

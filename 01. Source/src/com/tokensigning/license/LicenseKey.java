@@ -32,10 +32,24 @@ import com.tokensigning.common.LOG;
 import com.tokensigning.common.OSType;
 import com.tokensigning.utils.Utils;
 
+/**
+* LicenseKey: check license valid or not
+*
+* @author  Tuan
+* @version 1.0
+* @since   2020-07-12 
+*/
+
 public class LicenseKey {
     private static final String TIME_FOREVER            = "00:00:00";
     private static final String CERT_THUMPRINT 			= "96ba93bfda1a593efc2f4daeffc68b818c10ee37";
     
+    /**
+     * Check license key time
+     *
+     * @param 
+     * @return true or false
+     */
     
 	public static Boolean CheckValidTime(LicenseContent liContent)
     {
@@ -58,6 +72,13 @@ public class LicenseKey {
         }
         return false;
     }
+	
+	/**
+     * Check domain
+     *
+     * @param 
+     * @return true or false
+     */
 	public static Boolean checkValidHostName(LicenseContent liContent, String domain)
     {
 		String domainInLicense = liContent.getDomain();
@@ -90,6 +111,13 @@ public class LicenseKey {
         }
 		return true;
     }
+	
+	/**
+     * Check os support
+     *
+     * @param 
+     * @return true or false
+     */
 	private static Boolean CheckOSLicense(LicenseContent liContent)
 	{
 		String osSupport = liContent.getOs();
@@ -109,7 +137,13 @@ public class LicenseKey {
 			return false;
 		}
 	}
-	// common
+
+	/**
+     * Convert string to datetime
+     *
+     * @param s is date in string format
+     * @return Date
+     */
 	public static Date ConvertStringToTime(String s) {
         //String s = "24/03/2013 21:54:09"; 09/07/2017 00:00:00
         if (s != null) {
@@ -124,6 +158,13 @@ public class LicenseKey {
         }
         return null;
     }
+	
+	/**
+     * Get certificate thumbprint to check license's certificate
+     *
+     * @param cert is license's certificate
+     * @return thumbprint
+     */
 	public static String getThumbPrint(X509Certificate cert)
             throws NoSuchAlgorithmException, CertificateEncodingException {
         MessageDigest md = MessageDigest.getInstance("SHA-1");
@@ -133,6 +174,13 @@ public class LicenseKey {
         return hexify(digest);
 
     }
+	
+	/**
+     * Convert to hex string
+     *
+     * @param bytes 
+     * @return hex
+     */
     public static String hexify (byte bytes[]) {
 
         char[] hexDigits = {'0', '1', '2', '3', '4', '5', '6', '7', 
@@ -147,13 +195,28 @@ public class LicenseKey {
 
         return buf.toString();
     }
+    
+    /**
+     * Build response
+     *
+     * @param code is key code
+     * @param baseData is information
+     * @param errDesc is error description
+     * @return result
+     */
     public static String CreateJsonResult(int code, String baseData, String errDesc)
     {
         String respone = String.format("\"code\":%d, \"data\":\"%s\", \"error\":\"%s\"", code, baseData, errDesc);
         return "{" + respone + "}";
     }
-
-    //
+    
+    /**
+     * Check license key is valid or not
+     *
+     * @param key is license key
+     * @param domain is website's domain
+     * @return Key_Code is license code
+     */
     public static KEY_CODE checkKey(String key, String domain)
     {
     	Security.addProvider(new BouncyCastleProvider());
@@ -225,6 +288,13 @@ public class LicenseKey {
 		
 		return KEY_CODE.keyGood;
 	}
+    
+    /**
+     * Get information from license key
+     *
+     * @param cms signed data 
+     * @return license information
+     */
     public static String getOriginalData(CMSSignedData cms) {
         try {
             byte[] byte_out = null;

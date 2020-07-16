@@ -6,38 +6,71 @@ import java.util.List;
 import com.lowagie.text.pdf.PdfSignatureAppearance.SignatureComment;
 import com.tokensigning.common.PdfSignature;
 
+/**
+* PdfSignatureOption: define pdf signature options
+*
+* @author  Tuan
+* @version 1.0
+* @since   2020-07-12 
+*/
 public class PdfSignatureOption extends SignatureOption{
 	
-	
+	// signature page
 	public int page = 1; 
+	// signature location in pdf file
     public int llx = 10;
     public int lly = 10;
     public int urx = 150;
     public int ury = 75;
     
-    
+    // signature type is VisibleType (class VisibleType)
     private int SigType;
-    private String Signer ;
-    //public String SigningTime ;// HH:mm:ss dd/MM/yyyy
     
+    // signature signer
+    private String Signer ;
+    
+    // signature logo (image)
     private String ImageBase64 ;
+    
+    // signature validation onption (support on pdf foxit, adobe)
     private Boolean ValidationOption;
     
+    // signature color (code rgb)
     private String SigColorRGB;
+    
+    // signature text color
     private String fontColor;
+    
+    // signature text size
     private int SigTextSize;
-    	
+    
+    // signature location
     private String Location;
+    
+    // signature reason
     private String Reason;
+    
+    // signature hash algorithm
     private String DigestAlgrothim;
+    
+    // signature timestamp
     private String tsaUrl;
     private String tsaUserName;
     private String tsaPass;
+    
+    // text in signature
     private String signatureText;
+    
+    // signatures list in pdf file
     private List<PdfSignature> signatures;
+    
+    // comments list in pdf file
     private SignatureComment[] comments;
+    
+    // properties list in pdf file
     private HashMap<String, String> metadatas;
     
+    // contructor
     public PdfSignatureOption(int page, int llx, int lly, int urx, int ury, String ImageBase64, Boolean ValidationOption, 
     		String SigColorRGB, int SigTextSize, String DigestAlgrothim)
     {

@@ -59,17 +59,34 @@ import com.tokensigning.common.OSType;
 import com.tokensigning.form.CertificateChooser;
 import com.tokensigning.token.CertificateHandle;
 import com.tokensigning.token.IKeystoreBase;
-import com.tokensigning.token.PKCS11CryptoToken;
 import com.tokensigning.token.WindowsKeystore;
 import com.tokensigning.utils.Utils;
 
+/**
+* Xml: handle sign xml data
+*
+* @author  Tuan
+* @version 1.0
+* @since   2020-07-12 
+*/
+
 public class Xml {
+	// Fixed id if not set
 	private String 				NODE_ID = "NODE_TO_SIGN";
+	// id of tag signing time
 	private static String 		SIGNINGTIME_ID = "sigid";
+	// id of tag signature properties
 	private static final String SIGNATURE_PROPERTIES_ID = "proid";
+	// tag signingtime's name
 	private static final String SIGNINGTIME_TAGNAME = "SigningTime";
+	// handle certificate
 	private CertificateHandle handle = new CertificateHandle();
 
+	/**
+     * Constructor
+     *
+     * @param hadle is instance for certificate handle: get cert, key,... 
+     */
 	public Xml(CertificateHandle handle) {
 		super();
 		if (handle != null) {
@@ -78,9 +95,22 @@ public class Xml {
 			this.handle = new CertificateHandle();
 		}
 	}
+
+	/**
+     * Constructor
+     *
+     */
 	public Xml() {
 		
 	}
+	
+	/**
+     * Sign xml data
+     *
+     * @param data is file content in bytes
+     * @param xmlSignature is signature options
+     * @return result
+     */
 	// function
 	public SigningResult sign(byte[] data, XmlSignatureOption xmlSignature) {
 		SigningResult sigResult = new SigningResult();
@@ -103,7 +133,7 @@ public class Xml {
 				{
 					//TODO show chon cert
 					// serialNumber = "5401f8b96391ca0971053be87920ef25";
-					serialNumber = CertificateChooser.show(token.getAllCertificateInfo());
+					serialNumber = CertificateChooser.show(token.getAllCertInfoFromUserstore());
 				}
 				else
 				{
@@ -137,8 +167,20 @@ public class Xml {
 		}
 		return sigResult;
 	}
+	
+	/**
+     * Sign xml
+     *
+     * @param x509CertChain is signer's certificates chain
+     * @param cert is signer's certificate
+     * @param privKey is PrivateKey to sign
+     * @param data is file content in bytes
+     * @param xmlSigOption is signature options
+     * @return result
+     */
 	public SigningResult sign(List<X509Certificate> x509CertChain,
-			Certificate cert, PrivateKey privKey, byte[] data, XmlSignatureOption xmlSigOption) {
+			Certificate cert, PrivateKey privKey, byte[] data,
+			XmlSignatureOption xmlSigOption) {
 		String providerName = System.getProperty("jsr105Provider",
 				"org.jcp.xml.dsig.internal.dom.XMLDSigRI");
 		XMLSignatureFactory fac = null;
@@ -299,16 +341,10 @@ public class Xml {
 			result.setSigResult(SIGNING_RESULT.sigSuccess);
 			return result;
 		} catch (KeyException ex) {
-			java.util.logging.Logger.getLogger(Xml.class.getName()).log(
-					Level.SEVERE, null, ex);
 			LOG.write("Xml.Sign", ex.getMessage());
 		} catch (NoSuchAlgorithmException ex) {
-			java.util.logging.Logger.getLogger(Xml.class.getName()).log(
-					Level.SEVERE, null, ex);
 			LOG.write("Xml.Sign", ex.getMessage());
 		} catch (InvalidAlgorithmParameterException ex) {
-			java.util.logging.Logger.getLogger(Xml.class.getName()).log(
-					Level.SEVERE, null, ex);
 			LOG.write("Xml.Sign", ex.getMessage());
 		} catch (TransformerConfigurationException ex) {
 			LOG.write("Xml.Sign", ex.getMessage());
@@ -318,7 +354,15 @@ public class Xml {
 		result.setSigResult(SIGNING_RESULT.sigSigningFailed);
 		return result;
 	}
-
+	
+	/**
+     * create keyinfo tag in signature tag
+     *
+     * @param x509CertChain is signer's certificates chain
+     * @param cert is signer's certificate
+     * @param fac
+     * @return KeyInfo
+     */
 	private KeyInfo createKeyInfo(List<X509Certificate> x509CertChain,
 			Certificate cert, XMLSignatureFactory fac) throws KeyException {
 
@@ -340,7 +384,13 @@ public class Xml {
 		ki = kif.newKeyInfo(kviItems);
 		return ki;
 	}
-
+	/**
+     * create keyinfo tag in signature tag
+     *
+     * @param fac
+     * @param timeReferenceID id of signingtime tag     * 
+     * @return KeyInfo
+     */
 	private SignedInfo createSignedInfo(final XMLSignatureFactory fac,
 			String timeReferenceID) throws NoSuchAlgorithmException,
 			InvalidAlgorithmParameterException {
@@ -378,6 +428,12 @@ public class Xml {
 		return si;
 	}
 
+	/**
+     * convert string to time
+     *
+     * @param s is time in string format
+     * @return date
+     */
 	public static Date ConvertStringToTime(String s) {
 		// String s = "24/03/2013 21:54:09";
 		if (s != null) {
@@ -387,12 +443,17 @@ public class Xml {
 				Date date = sdf1.parse(s);
 				return date;
 			} catch (ParseException ex) {
-				// System.out.println("Exception " + ex);
+				LOG.write("Xml.ConvertStringToTime", ex.getMessage());
 			}
 		}
 		return null;
 	}
-	
+	/**
+     * convert time to string format TZ (iso 8601)
+     *
+     * @param t is datetime
+     * @return date in string format
+     */
 	public static String ConvertDateToStringTZ(Date t) {
 		// String s = "24/03/2013 21:54:09";
 		if (t != null) {

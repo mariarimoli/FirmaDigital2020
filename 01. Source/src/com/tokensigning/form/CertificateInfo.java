@@ -1,6 +1,19 @@
 package com.tokensigning.form;
 
+/**
+* CertificateInfo: object define certificate information
+*
+* @author  Tuan
+* @version 1.0
+* @since   2020-07-12 
+*/
+
 public class CertificateInfo {
+	// Store type
+	public final static int USER_STORE = 1;
+	public final static int LOCAL_STORE = 2;
+	public final static int ALL_STORE = 0;
+	
 	public CertificateInfo(String subjectCN, String serial, String base64,
 			String issuerCN, String notBefore, String notAfter) {
 		super();
@@ -11,14 +24,25 @@ public class CertificateInfo {
 		this.notBefore = notBefore;
 		this.notAfter = notAfter;
 	}
+	
+	// Owner certificate
 	private String subjectCN;
+	// Certificate serial number
 	private String serial;
+	// Certificate content encoded base64
 	private String base64;
+	// Issuer certificate
 	private String issuerCN;
+	// Date start
 	private String notBefore;
+	// Date expired
 	private String notAfter;
+	// Subject OU
 	private String subjectOU;
+	// Subject SN
 	private String subjectSN;
+	// Certificate Store type
+	private int certStore;
 	
 	public CertificateInfo(String subjectCN, String serialNumber) {
 		super();
@@ -78,6 +102,14 @@ public class CertificateInfo {
 
 	public void setSubjectOU(String subjectOU) {
 		this.subjectOU = subjectOU;
+	}
+
+	public int getCertStore() {
+		return certStore;
+	}
+
+	public void setCertStore(int certStore) {
+		this.certStore = certStore;
 	}
 	
 }

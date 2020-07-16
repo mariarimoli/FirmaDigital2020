@@ -3,7 +3,6 @@ package com.tokensigning.signature;
 import java.awt.Color;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -52,26 +51,43 @@ import com.lowagie.text.pdf.PdfWriter;
 import com.lowagie.text.pdf.TSAClient;
 import com.lowagie.text.pdf.TSAClientBouncyCastle;
 import com.tokensigning.common.Base64Utils;
+import com.tokensigning.common.DataResult;
 import com.tokensigning.common.LOG;
 import com.tokensigning.common.OSType;
-import com.tokensigning.common.VisibleType;
+import com.tokensigning.configuraion.ProxyInfo;
+import com.tokensigning.exception.TSSignatureException;
 import com.tokensigning.form.CertificateChooser;
+import com.tokensigning.form.CertificateInfo;
+import com.tokensigning.form.ProxyConfigurationForm;
 import com.tokensigning.token.CertificateHandle;
+import com.tokensigning.token.CertificateUtils;
 import com.tokensigning.token.IKeystoreBase;
 import com.tokensigning.token.WindowsKeystore;
 import com.tokensigning.utils.Utils;
 
-import certificateutils.CertificateUtils;
-
+/**
+* Pdf: handle sign pdf file
+*
+* @author  Tuan
+* @version 1.0
+* @since   2020-07-12 
+*/
 public class Pdf {
-	// public static final Logger LOG = Logger.getLogger(Pdf.class);
+	// 
 	private static final String RGB = "0,0,255";
 	private static final String FUNCTION = "Pdf.Sign";
-	private static final String HASH_ALGORITHM = "SHA-256";
+	//private static final String HASH_ALGORITHM = "SHA-256";
+	private static final String HASH_ALGORITHM = "SHA1";
 	private static final Gson _gson = new GsonBuilder().disableHtmlEscaping().create();
 	private CertificateHandle handle = new CertificateHandle();
 	private static boolean isCertInLocalMachine = false;
+	private String _certSerial = null;
 	
+	/**
+     * Constructor
+     *
+     * @param hadle is instance for certificate handle: get cert, key,... 
+     */
 	public Pdf(CertificateHandle handle) {
 		super();
 		if (handle != null) {
@@ -81,22 +97,39 @@ public class Pdf {
 		}
 	}
 
+	/**
+     * Constructor
+     *
+     */
 	public Pdf() {
 	}
 
+	
+	/**
+     * Sign pdf
+     *
+     * @param pdfbytes is file content in bytes
+     * @param password is files's password
+     * @param SigningResult is signature options
+     * @return result
+     */
 	public SigningResult sign(byte[] pdfbytes, byte[] password,
 			PdfSignatureOption pdfSignature) {
 		SigningResult sigResult = new SigningResult();
 		try {
+			LOG.write("Pdf.sign", "Sign pdf init");
 			// PKCS11
 			OSType osType = Utils.getOperatingSystemType();
 			IKeystoreBase token = null;
+			isCertInLocalMachine = pdfSignature.getCertStore() == CertificateInfo.LOCAL_STORE;
 			if (osType == OSType.Windows)
 			{
+				LOG.write("Pdf.sign", "Sign pdf windows");
 				token = new WindowsKeystore();
 			}
 			else
 			{
+				LOG.write("Pdf.sign", "Sign pdf pkcs11");
 				token = this.handle.getPkcs11Token();
 			}
 			if (null != token) {
@@ -106,24 +139,36 @@ public class Pdf {
 						|| pdfSignature.getCertificateSerial().isEmpty()) {
 					// serialNumber = "5401f8b96391ca0971053be87920ef25";
 					serialNumber = CertificateChooser.show(token
-							.getAllCertificateInfo());
+							.getAllCertInfoFromUserstore());
 				} else {
 					serialNumber = pdfSignature.getCertificateSerial();
 				}
-				String alias = token.getCertificateAlias(serialNumber);
-				if (null != alias) {
-					Certificate[] certChain = token.getCertificateChain(alias);
-					PrivateKey privKey = token.getPrivateKey(alias);
-					if(pdfSignature.getPage() == 0)
-					{
-						pdfSignature.setPage(1);
+				_certSerial = serialNumber;
+				LOG.write("Pdf.sign", "Serial: " + _certSerial);
+				//						
+				Certificate[] certChain = null;
+				PrivateKey privKey = null;
+				if (!isCertInLocalMachine)
+				{
+					LOG.write("Pdf.sign", "User store");
+					String alias = token.getCertificateAlias(serialNumber);
+					if (null != alias) {
+						certChain = token.getCertificateChain(alias);
+						privKey = token.getPrivateKey(alias);
+						
+					} else {
+						sigResult.setSigResult(SIGNING_RESULT.sigBadKey);
+						return sigResult;
 					}
-					
-					return sign(certChain, privKey, pdfbytes, password,
-							pdfSignature);
-				} else {
-					sigResult.setSigResult(SIGNING_RESULT.sigBadKey);
 				}
+				else
+				{
+					LOG.write("Pdf.sign", "Local Machine Store");
+					certChain = token.getCertificateChainBySerial(serialNumber);
+				}
+				return sign(certChain, privKey, pdfbytes, password,
+						pdfSignature);
+				
 			} else {
 				LOG.write("Pdf.sign", "Token init failed");
 				sigResult.setSigResult(SIGNING_RESULT.sigBadKey);
@@ -134,6 +179,12 @@ public class Pdf {
 		return sigResult;
 	}
 	
+	/**
+     * Get widgets from config
+     *
+     * @param signatures is list signature in file
+     * @return Array of widget
+     */
 	public SignatureWidget[] getSigWidgets(List<com.tokensigning.common.PdfSignature> signatures) {
 		String sigStr = _gson.toJson(signatures);
 		SignatureWidget[] widgets = null;
@@ -146,6 +197,13 @@ public class Pdf {
 		return widgets;
 	}
 
+	/**
+     * Calculate Signature's Comments
+     *
+     * @param stamper
+     * @param sigComments is list comment
+     * @return PdfStamper
+     */
 	private PdfStamper calculateSignComments(PdfStamper stamper, SignatureComment[] sigComments) {
         try {
             stamper.getSignatureAppearance().setSignatureComments(sigComments);
@@ -156,6 +214,12 @@ public class Pdf {
         return stamper;
     }
 	
+	/**
+     * Get signature image
+     * 
+     * @param imageBase64 is imaege content encoded base64
+     * @return Image
+     */
 	private Image getImage(String imageBase64)
 	{
 		if (imageBase64 != null && !imageBase64.isEmpty()) {
@@ -177,6 +241,13 @@ public class Pdf {
 		return null;
 	}
 	
+	/**
+     * Calculate text visible in signature
+     *
+     * @param today is datetime now
+     * @param params is signature confgi
+     * @return PdfStamper
+     */
 	protected String calculateSigText(Date today, Certificate[] certChain, 
 			PdfSignatureOption params) {
 		
@@ -201,8 +272,20 @@ public class Pdf {
 
 		      return text;
 		}
-  }
-
+	}
+	
+	/**
+     * Sign pdf
+     *
+     * @param today is datetime now
+     * @param certChain is signer's certificates chain
+     * @param privKey is PrivateKey to sign
+     * @param pdfbytes is file content in bytes
+     * @param password is files's password
+     * @param SigningResult is signature options
+     * @return result
+     */
+	
 	public SigningResult sign(Certificate[] certChain, PrivateKey privKey,
 			byte[] pdfbytes, byte[] password, PdfSignatureOption pdfSignature) {
 		SigningResult sigResult = new SigningResult();
@@ -222,6 +305,11 @@ public class Pdf {
 			pdfSignature = new PdfSignatureOption(1, 10, 10, 150, 75, null,
 					true, RGB, 11, HASH_ALGORITHM);
 		}
+		if(pdfSignature.getPage() == 0)
+		{
+			pdfSignature.setPage(1);
+		}
+		
 		ByteArrayOutputStream fout = new ByteArrayOutputStream();
 
 		try {
@@ -348,13 +436,20 @@ public class Pdf {
 			sigResult.setSigResult(SIGNING_RESULT.sigSuccess);
 			sigResult.setSignedData(fout.toByteArray());
 			return sigResult;
-		} catch (DocumentException | IOException e1) {
-			LOG.write(FUNCTION, e1.getMessage());
+		} catch (Exception ex) {
+			LOG.write(FUNCTION, ex.getMessage());
 			sigResult.setSigResult(SIGNING_RESULT.sigSigningFailed);
 			return sigResult;
 		}
 	}
 
+	/**
+     * Calculate signature field name
+     *
+     * @param reader is pdf reader
+     * @param fieldName for check fieldname is exist
+     * @return field name new
+     */
 	public static String calculateSigFieldName(PdfReader reader,
 			String fieldName) {
 		String newField = fieldName;
@@ -372,6 +467,13 @@ public class Pdf {
 		return newField;
 	}
 
+	/**
+     * Calculate signature size
+     *
+     * @param today is datetime now
+     * @param params is signature confi
+     * @return signature size
+     */
 	protected int calculateEstimatedSignatureSize(Certificate[] certChain,
 			TSAClient tsc, byte[] ocsp, CRL[] crlList) {
 		int estimatedSize = 0;
@@ -428,6 +530,19 @@ public class Pdf {
 		return estimatedSize;
 	}
 
+	/**
+     * Calculate signature
+     *
+     * @param sgn is instance to calculate signature
+     * @param size is signature size
+     * @param messageDigest is hash algorithm
+     * @param cal is signature time
+     * @param certChain is user's certificate chain
+     * @param tsc is timestamp
+     * @param ocsp is ocsp response
+     * @param sap is pdf signature instance
+     * @return signature
+     */
 	protected byte[] calculateSignature(PdfPKCS7 sgn, int size,
 			MessageDigest messageDigest, Calendar cal, Certificate[] certChain,
 			TSAClient tsc, byte[] ocsp, PdfSignatureAppearance sap) {
@@ -452,9 +567,26 @@ public class Pdf {
 			if (isCertInLocalMachine)
 			{
 				byte[] hashValue = Hash(sh, HASH_ALGORITHM);
-				String hashAlgorithm = "SHA256";
-				String sigBase64 = CertificateUtils.SignHash(Base64Utils.base64Encode(hashValue), "", hashAlgorithm);
-				sgn.setExternalDigest(Base64Utils.base64Decode(sigBase64), null, "RSA");
+				String hashAlgorithm = "SHA1";
+				if (HASH_ALGORITHM == "SHA-256")
+				{
+					hashAlgorithm = "SHA256";
+				}
+				//String sigResponse = CertificateUtils.SignHash(Base64Utils.base64Encode(hashValue), _certSerial, hashAlgorithm);
+				String sigResponse = CertificateUtils.signHash(Base64Utils.base64Encode(hashValue), _certSerial, hashAlgorithm);
+				Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+				DataResult sig = gson.fromJson(sigResponse, DataResult.class);
+				if (sig.getCode() == 1)
+				{
+					sgn.setExternalDigest(Base64Utils.base64Decode(sig.getBaseData()), null, "RSA");	
+				}
+				else
+				{
+					LOG.write("calculateSignature",
+							"Error calculating signature: " + sig.getBaseData());
+					throw new TSSignatureException(sig.getBaseData());					
+				}
+				
 			}
 			else
 			{
@@ -472,6 +604,12 @@ public class Pdf {
 		return null;
 	}
 
+	/**
+     * Calculate signature text font
+     *
+     * @param params is signature configuration
+     * @return PdfStamper
+     */
 	private Font calculateFont(PdfSignatureOption params) {
         Font font = FontFactory.getFont(FontFactory.TIMES_ROMAN, 8f, Font.NORMAL, Color.BLACK);
         String pathFont = Utils.getFontFolder();
@@ -498,10 +636,40 @@ public class Pdf {
         return font;
     }
 	
+	/**
+     * Get time from timestamp server
+     *
+     * @param url Timestamp server url
+     * @param username
+     * @param password
+     * @return timestamp client
+     */
 	protected TSAClient getTimeStampClient(String url, String username, String password) {
-        return new TSAClientBouncyCastle(url, username, password);
+		TSAClientBouncyCastle tsaClient = new TSAClientBouncyCastle(url, username, password);
+		ProxyInfo proxyInfo = ProxyConfigurationForm.getProxyConfig();
+		if (proxyInfo != null)
+		{
+			tsaClient.setIsUseProxy(true);
+			tsaClient.setProxyServer(proxyInfo.getServer());
+			tsaClient.setProxyPort(proxyInfo.getPort());
+			tsaClient.setProxyUser(proxyInfo.getUserName());
+			tsaClient.setProxyPass(proxyInfo.getPassword());	
+		}
+		else
+		{
+			tsaClient.setIsUseProxy(false);
+		}
+		
+		return tsaClient;
     }
 
+	/**
+     * Add properties to pdf file
+     *
+     * @param input is pdf content
+     * @param metadatas list meta add to properties
+     * @return pdf content after add properties
+     */
 	public static byte[] addCustomProperties(byte[] input, HashMap<String, String> metadatas) {
 		try {
 
@@ -530,13 +698,19 @@ public class Pdf {
 			fout.close();
 			return fout.toByteArray();
 
-		} catch (IOException | DocumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (IOException | DocumentException e) {			
+			LOG.write("PDF", e.getMessage());
 		}
 		return null;
 	}
 
+	/**
+     * Calculate hash of string
+     *
+     * @param input is data in bytes
+     * @param digestAlgorithm is hash algorithm
+     * @return hash
+     */
 	private static byte[] Hash(byte[] input, String digestAlgorithm) {
         try {
             MessageDigest crypt = MessageDigest.getInstance(digestAlgorithm);
@@ -548,4 +722,27 @@ public class Pdf {
         }
         return null;
     }
+
+	/**
+	* VisibleType: signature type in pdf file
+	*
+	* @author  Tuan
+	* @version 1.0
+	* @since   2020-07-12 
+	*/
+	static class VisibleType {
+		// Visible text only
+	    public final static int TEXT_ONLY = 1;
+	    // Visible text and logo (logo in left)
+	    public final static int TEXT_WITH_LOGO_LEFT = 2;
+	    // Visible logo (image) only
+	    public final static int LOGO_ONLY = 3;
+	    // Visible text and logo (logo on top)
+	    public final static int TEXT_WITH_LOGO_TOP = 4;
+	    // Visible text and logo (logo is background)
+	    public final static int TEXT_WITH_BACKGROUND = 5;
+	    // Signature invisible
+	    public final static int NONE = 0;
+	}
+
 }

@@ -1,5 +1,13 @@
 package com.tokensigning.common;
 
+/**
+* RectangleCustom: define signature rectangle on pdf file
+*
+* @author  Tuan
+* @version 1.0
+* @since   2020-07-12 
+*/
+
 public class RectangleCustom {
 	public RectangleCustom(float llx, float lly, float urx, float ury)
     {
@@ -38,6 +46,7 @@ public class RectangleCustom {
 	public void setPage(int page) {
 		this.page = page;
 	}
+	
 	public float llx ;
     public float lly ;
     public float urx ;

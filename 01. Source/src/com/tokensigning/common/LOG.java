@@ -10,6 +10,13 @@ import java.util.Calendar;
 
 import com.tokensigning.utils.Utils;
 
+/**
+* LOG: write logs
+*
+* @author  Tuan
+* @version 1.0
+* @since   2020-07-12 
+*/
 public class LOG {
 	public static void write(String function, String log) {
 		String time = new SimpleDateFormat("HH:mm:ss").format(Calendar

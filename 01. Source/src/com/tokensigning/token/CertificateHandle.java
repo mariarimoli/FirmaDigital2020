@@ -30,11 +30,30 @@ import com.tokensigning.form.CertificateChooser;
 import com.tokensigning.form.CertificateInfo;
 import com.tokensigning.form.PINVerification;
 import com.tokensigning.utils.Utils;
+/**
+* CertificateHandle: handle get certificate
+*
+* @author  Tuan
+* @version 1.0
+* @since   2020-07-12 
+*/
 
 public class CertificateHandle {
+	
+	/**
+     * Constructor
+     *
+     */
+	public CertificateHandle() {
+	}
+
+	// Object interact with usb token by pkcs11 standard
 	private PKCS11CryptoToken _token;
+	// PIN of Usb token
 	private String PIN;
+	// Usb token Pkcs#11 driver 
 	private String pkcs11Provider;
+	// Usb token slot
 	private String slot;
 
 	public String getPIN() {
@@ -61,9 +80,12 @@ public class CertificateHandle {
 		this.slot = slot;
 	}
 
-	public CertificateHandle() {
-	}
-
+	/**
+     * get object PKCS11CryptoToken
+     *
+     * @param 
+     * @return Pkcs11 crypto token 
+     */
 	public PKCS11CryptoToken getPkcs11Token() {
 		if (TOKEN_STATUS.TOKEN_AVAILABLE == checkLogin()) {
 			return this._token;
@@ -72,6 +94,12 @@ public class CertificateHandle {
 		}
 	}
 
+	/**
+     * init object PKCS11CryptoToken
+     *
+     * @param 
+     * @return Pkcs11 crypto token 
+     */
 	public PKCS11CryptoToken initToken() {
 		try {
 			// PKCS11
@@ -150,6 +178,14 @@ public class CertificateHandle {
 		return null;
 	}
 
+	/**
+     * Get user's certificate information
+     * Windows OS: get certificate from windows key store use class WindowsKeystore
+     * MacOS + Linux: get certificate directly from Usb Token by Pkcs#11 standard use class PKCS11CryptoToken 
+     *
+     * @param certFilter is conditions to filter certificate
+     * @return Certificate information
+     */
 	public String getCertificateInfo(CertificateFilter certFilter) {
 		String serialNumber = null;
 		List<CertificateInfo> certInfo = null;
@@ -175,8 +211,7 @@ public class CertificateHandle {
 		try {
 			certInfo = token.getAllCertificateInfo(certFilter);
 			if (certInfo != null && certInfo.size() > 0) {
-				serialNumber = CertificateChooser.show(token
-						.getAllCertificateInfo());
+				serialNumber = CertificateChooser.show(certInfo);
 			}
 		} catch (CryptoTokenOfflineException e) {
 			LOG.write(CertificateHandle.class.toString(), e.getMessage());
@@ -193,6 +228,12 @@ public class CertificateHandle {
 		return null;
 	}
 
+	/**
+     * check token login or not use Pkcs#11 standard
+     *
+     * @param 
+     * @return TOKEN_STATUS
+     */
 	public TOKEN_STATUS checkLogin() {
 		File tmpConfigFile;
 		try {
@@ -230,6 +271,12 @@ public class CertificateHandle {
 		return TOKEN_STATUS.TOKEN_NOTFOUND;
 	}
 
+	/**
+     * check token init or not usb Pkcs#11 standard
+     *
+     * @param 
+     * @return true or false
+     */
 	public Boolean checkTokenInit() {
 		PKCS11CryptoToken token = null;
 		try {
@@ -245,6 +292,12 @@ public class CertificateHandle {
 		return true;
 	}
 
+	/**
+     * show certificate form for chooser
+     *
+     * @param connect is conditions to filter certificate
+     * @return certificate info
+     */
 	public static String showCertificateViewer(Connector connect) {
 		if (connect.getArgs().length == 0) {
 			return "0";
@@ -271,14 +324,19 @@ public class CertificateHandle {
 			};
 			t1.start();
 			return "1";
-		} catch (CertificateException e) {
-			// TODO Auto-generated catch block
+		} catch (CertificateException e) {			
 			e.printStackTrace();
 			LOG.write("CertificateHandle.showCertificateViewer", e.getMessage());
 		}
 		return "0";
 	}
 
+	/**
+     * get certificate with specify serial number use Pkcs#11 standard
+     *
+     * @param serialNumber is condition to filter certificate
+     * @return Certificate
+     */
 	public Certificate getCertificateBySerial(String serialNumber) {
 		PKCS11CryptoToken token = getPkcs11Token();
 		try {
@@ -295,22 +353,22 @@ public class CertificateHandle {
 		return null;
 	}
 
+	/**
+     * get certificate with specify serial number use Pkcs#11 standard
+     *
+     * @param serialNumber is condition to filter certificate
+     * @return X509Certificate
+     */
 	public X509Certificate getX509CertificateBySerial(String serialNumber) {
-		PKCS11CryptoToken token = getPkcs11Token();
-		try {
-			if (null != token) {
-				String alias = token.getCertificateAlias(serialNumber);
-				if (null != alias) {
-					Certificate cert = token.getCertificate(alias);
-					return (X509Certificate) cert;
-				}
-			}
-		} catch (Exception ex) {
-			LOG.write("CertificateHandle.getCert", ex.getMessage());
-		}
-		return null;
+		return (X509Certificate) getCertificateBySerial(serialNumber);
 	}
 
+	/**
+     * check usb token plugged or not use Pkcs#11 standard
+     *
+     * @param 
+     * @return result
+     */
 	public static int checkToken() {
 		List<String> providersList = CryptoTokenHelper.getProviderExist();
 		if (providersList.size() > 0) {

@@ -1,7 +1,36 @@
 package com.tokensigning.signature;
 
+/**
+* XmlSignatureOption: define xml signature options
+*
+* @author  Tuan
+* @version 1.0
+* @since   2020-07-12 
+*/
+
 public class XmlSignatureOption extends SignatureOption {
-	public String getParrentTagSigning() {
+	//
+	public String ParrentTagSigning;
+	// xml tag signing
+    public String TagSigning;
+    // id of tag signing
+    public String NodeToSign;
+    // xml tag save signature
+    public String TagSaveResult;
+    // xml tag xpath filter
+    public String NameXPathFilter;
+    // id of tag signing time
+    public String NameIDTimeSignature;
+    // use ds prefix or not
+    public Boolean DsSignature;
+    // signature type: enveloped, enveloping, detached
+    public String SigningType;
+    // certificate to sign 
+    public String CertificateSerial;
+    // Verify data befor sign
+    public Boolean ValidateBefore;
+    
+    public String getParrentTagSigning() {
 		return ParrentTagSigning;
 	}
 	public void setParrentTagSigning(String parrentTagSigning) {
@@ -61,14 +90,6 @@ public class XmlSignatureOption extends SignatureOption {
 	public void setValidateBefore(Boolean validateBefore) {
 		ValidateBefore = validateBefore;
 	}
-	public String ParrentTagSigning;
-    public String TagSigning;
-    public String NodeToSign;
-    public String TagSaveResult;
-    public String NameXPathFilter;
-    public String NameIDTimeSignature;
-    public Boolean DsSignature;
-    public String SigningType;
-    public String CertificateSerial;
-    public Boolean ValidateBefore;
+	
+	
 }

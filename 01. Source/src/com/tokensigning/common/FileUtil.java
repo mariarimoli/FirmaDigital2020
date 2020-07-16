@@ -9,10 +9,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
+/**
+* Comment: read/wire file
+*
+* @author  Tuan
+* @version 1.0
+* @since   2020-07-12 
+*/
 
 public class FileUtil {
-	private static final Logger LOG = Logger.getLogger(FileUtil.class);
+	
 	public static byte[] readBytesFromFile(String inputPath) throws IOException {
 		ByteArrayOutputStream ous = null;
 		InputStream ios = null;
@@ -41,25 +47,19 @@ public class FileUtil {
 
 	}
 	
-	public static void removeTmpFile(File file){
-		file.delete();
-	}
-	
-	public static void writeToFile(byte[] input, String pathname) {
+	public static void writeToFile(byte[] input, String pathname) throws IOException {
 		FileOutputStream outStream = null;
 		try {
 			outStream = new FileOutputStream(new File(pathname));
 			outStream.write(input);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw e;
 		} finally {
 			if (outStream != null) {
 				try {
 					outStream.close();
 				} catch (IOException e) {
-					e.printStackTrace();
+					throw e;
 				}
 			}
 		}
@@ -83,9 +83,9 @@ public class FileUtil {
 			FileOutputStream output = new FileOutputStream(path);
 			prop.store(output, "This is overwrite file");
 		} catch (FileNotFoundException e) {
-			LOG.error("FileNotFoundException: " + e.getMessage());
+			LOG.write("FileUtil", "FileNotFoundException: " + e.getMessage());
 		} catch (IOException e) {
-			LOG.error("IOException: " + e.getMessage());
+			LOG.write("FileUtil", "IOException: " + e.getMessage());
 		}
 	}
 
@@ -104,9 +104,9 @@ public class FileUtil {
 
 			return prop.getProperty(key);
 		} catch (FileNotFoundException e) {
-			LOG.error("FileNotFoundException: " + e.getMessage());
+			LOG.write("FileUtil","FileNotFoundException: " + e.getMessage());
 		} catch (IOException e) {
-			LOG.error("IOException: " + e.getMessage());
+			LOG.write("FileUtil","IOException: " + e.getMessage());
 		}
 
 		return "";

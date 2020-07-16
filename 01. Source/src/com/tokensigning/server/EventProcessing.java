@@ -18,8 +18,16 @@ import com.tokensigning.signature.SigningResult;
 import com.tokensigning.signature.Xml;
 import com.tokensigning.signature.XmlSignatureOption;
 import com.tokensigning.token.CertificateHandle;
+/**
+* EventProcessing: handle request
+*
+* @author  Tuan
+* @version 1.0
+* @since   2020-07-12 
+*/
 
 public class EventProcessing {
+	
 	private CertificateHandle certHandle;
 	Gson _gson = new GsonBuilder().disableHtmlEscaping().create();
 	public EventProcessing(CertificateHandle certHandle) {
@@ -32,10 +40,14 @@ public class EventProcessing {
 			this.certHandle = new CertificateHandle();
 		}
 	}
-	// sign
+	/**
+     * Method used when sign pdf
+     *
+     * @param connect is request from webclient
+     * @return response from TokenSigning
+     */
 	public TSResponse signPdf(Connector connect)
-	{
-		//pdf.sign(pdfbytes, password, pdfSignature, serialNumber)
+	{		
 		SigningResult result = new SigningResult();
 		if (connect.getArgs().length == 0)
 		{
@@ -74,6 +86,12 @@ public class EventProcessing {
 		result = pdf.sign(pdfbytes, null, sigOption);
 		return getResult(result);
 	}
+	/**
+     * Method used when sign Xml
+     *
+     * @param connect is request from webclient
+     * @return response from TokenSigning
+     */	
 	public TSResponse signXml(Connector connect)
 	{
 		SigningResult result = new SigningResult();
@@ -92,6 +110,12 @@ public class EventProcessing {
 		result = xml.sign(data, sigOption);
 		return getResult(result);
 	}
+	/**
+     * Method used when sign office
+     *
+     * @param connect is request from webclient
+     * @return response from TokenSigning
+     */	
 	public TSResponse signOffice(Connector connect)
 	{
 		SigningResult result = new SigningResult();
@@ -110,6 +134,12 @@ public class EventProcessing {
 		result = office.sign(data, sigOption);
 		return getResult(result);
 	}
+	/**
+     * Method used when sign text
+     *
+     * @param connect is request from webclient
+     * @return response from TokenSigning
+     */	
 	public TSResponse signCms(Connector connect)
 	{
 		SigningResult result = new SigningResult();
@@ -129,7 +159,12 @@ public class EventProcessing {
 		return getResult(result);
 	}
 	
-	// get cert info
+	/**
+     * Method used when get certificate info
+     *
+     * @param connect is request from webclient
+     * @return response from TokenSigning
+     */	
 	public TSResponse getCertInfo(Connector connect)
 	{
 		CertificateFilter certFilter = null;
@@ -138,8 +173,7 @@ public class EventProcessing {
 			certFilter = _gson.fromJson(connect.getArgs()[0], CertificateFilter.class);
 		}
 		
-		TSResponse resp = new TSResponse(RESPONSE_CODE.error.getValue(), null, null);
-		//CertificateHandle handle = new CertificateHandle();
+		TSResponse resp = new TSResponse(RESPONSE_CODE.error.getValue(), null, null);		
 		String certInfo = this.certHandle.getCertificateInfo(certFilter);
 		if (certInfo == null || certInfo.isEmpty())
 		{
@@ -152,7 +186,12 @@ public class EventProcessing {
 		}
 		return resp;
 	}
-	// Common
+	/**
+     * Method used when build response
+     *
+     * @param connect is request from webclient
+     * @return response from TokenSigning
+     */	
 	private static TSResponse getResult(SigningResult sigResult)
     {
 		TSResponse result = new TSResponse(RESPONSE_CODE.error.getValue(), null, null);
@@ -200,6 +239,12 @@ public class EventProcessing {
         }
         return result;
     }
+	/**
+     * Method used when build response
+     *
+     * @param connect is request from webclient
+     * @return response from TokenSigning
+     */	
 	public static TSResponse CreateJsonResult(SIGNING_RESULT code, String baseData, String errDesc)
     {
 		TSResponse data = new TSResponse(code.ordinal(), baseData, errDesc);

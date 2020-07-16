@@ -18,16 +18,34 @@ import com.tokensigning.common.OSType;
 import com.tokensigning.form.CertificateChooser;
 import com.tokensigning.token.CertificateHandle;
 import com.tokensigning.token.IKeystoreBase;
-import com.tokensigning.token.PKCS11CryptoToken;
 import com.tokensigning.token.WindowsKeystore;
 import com.tokensigning.utils.Utils;
+
+/**
+* Office: handle sign office > version 2007 (openxml: xlsx, pptx, docx)
+*
+* @author  Tuan
+* @version 1.0
+* @since   2020-07-12 
+*/
 
 public class Office {
 	public static final  Logger LOG = Logger.getLogger(Pdf.class);
 	private CertificateHandle handle = new CertificateHandle();
+	
+	/**
+     * Constructor
+     *
+     */
 	public Office() {
 	
 	}
+	
+	/**
+     * Constructor
+     *
+     * @param hadle is instance for certificate handle: get cert, key,... 
+     */
 	public Office(CertificateHandle handle) {
 		super();
 		if (handle != null) {
@@ -36,6 +54,14 @@ public class Office {
 			this.handle = new CertificateHandle();
 		}
 	}
+	
+	/**
+     * Sign office
+     *
+     * @param data is file content in bytes
+     * @param sigOption is signature options
+     * @return result
+     */
 	public SigningResult sign(byte[] data, SignatureOption sigOption) {
 		SigningResult sigResult = new SigningResult();
 		try {		
@@ -55,7 +81,7 @@ public class Office {
 				String serialNumber = null;
 				if (sigOption == null || sigOption.getCertificateSerial() == null || sigOption.getCertificateSerial().isEmpty())
 				{
-					serialNumber = CertificateChooser.show(token.getAllCertificateInfo());
+					serialNumber = CertificateChooser.show(token.getAllCertInfoFromUserstore());
 				}
 				else
 				{
@@ -83,7 +109,17 @@ public class Office {
 		}
 		return sigResult;
 	}
-	// option: sigOption => de nang cap phan option ky sha256,...
+	
+	
+	/**
+     * Sign office
+     *
+     * @param certChain is signer's certificates chain
+     * @param privKey is PrivateKey to sign
+     * @param data is file content in bytes
+     * @param sigOption is signature options
+     * @return result
+     */
 	public SigningResult sign(Certificate[] certChain, PrivateKey privKey, byte[] data, SignatureOption siOption) {
 		org.openxml4j.opc.Package docxPackage;
 		SigningResult result = new SigningResult();

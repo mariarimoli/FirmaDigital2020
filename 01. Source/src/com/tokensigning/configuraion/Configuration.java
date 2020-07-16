@@ -24,19 +24,33 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import com.tokensigning.common.Base64Utils;
+import com.tokensigning.common.IconLoader;
 import com.tokensigning.common.LOG;
 import com.tokensigning.common.OSType;
 import com.tokensigning.form.PINVerification;
 import com.tokensigning.utils.LanguageOption;
 import com.tokensigning.utils.Utils;
 
+
+/**
+* Configuration: config environment when install or run TokenSigning
+*
+* @author  Tuan
+* @version 1.0
+* @since   2020-07-12 
+*/
+
 public class Configuration {
-	private final static String SSL_CA_SERIAL = "5cd3818b";
-	
 	private final static String killFirefoxProcess = "killall -9 \"firefox\"";
 	private final static String killSafariProcess = "killall -9 \"Safari\"";
 	private final static String killChromeProcess = "killall -9 \"Google Chrome\"";
-	public  static final String ICON_WARNING= "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAA3QAAAN0BcFOiBwAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAASbSURBVFiFxZdtTJVlGMd/1/2cl+cgHOSgCKjTlGFEFDrUGAIBQ8DICeopRXHK8syXWetbH3RuuvVFp261am2t1Rc3+yK51cS5UEcvY9ZW0idbrJjhS04BhfN29eEArgx4Dtj6f7xf/tfvvq77fp77FlXl/5RruhM3bg/laDTccOtmX0Qi5sKlS1/emI6PJJuB9aFQimcw8plCA0D/jd8THcoXw2n2pu729gf/GUAwGPTF3KnngOq56bBqmZDlvc+ZzkGu98cALsaHBxu7uroeOvVMqgRRz6xDolQ/lS0c3m5ItQFm0/BCKvuO/8FPfbFq4007BLzl1NNxBja1tC1RtMcyeE+ELObP+Xv/3b4hmt6+TTTOiFj6zOWOjl+c+BqnpKp6DPA2rJTHggNkZKfwymoPgFejcsypryOA5q27qhGa/CkQrJhgiiW01ftJ9wkITWU1ddVPBCAYDFpGOAmwpcowy060D4fh9FdxPmi/x8ORRBk9gRT2vOgdNdaTwWDQmjFA3J26W6Fo8TyhdrmMt3dcVc5cVk5ffMDZKwOJRkt4qSyNvCyDKkV9d+7unhFAY0tLhsIRgF11gjyKz683E6s2xuJ6X2S8XdJ9vLk2kSZROVJe3pgxbQAb72Egs7RAKFwkkw19JEt4rmAWVctcAJm4w4enBdD86msFCnvdLthR6/iwJOS32V9j43GBwt7SytqCpAHEip0AXBtKhbnpycXHMsyb72PrKg+Ay2XJiaQAmrftagTqMv3QVJbk6sfkt9lW6iUrTVCoK6+qa3QEEAqF3KJyHGB7jcHrnl58LIMdsNlTmTiWKnq8pKTkMbfHAG4PRQ+A5i9bIJQ/63DjTSS/TW2hm6L5FkC+Ly1wYFKA5tbWLFQPCtBWP8PgAJYBv83rNV4EQDhYVleXNSGAibqPAulVxcLSnMkBvGP/UVVszyRj/TZP51isK3KjkG4iHP1XgKaWncUq2ubzQEvV1BuvuliYZYPHFWNdaerEA0ezEKrwkOIRFG0rq1pbPNY9fh8wcAowm8oNsyfxG1NervDhGxaqOZNnAMBvE7g/zI5SN+91ho0Ip4DK0bjQ3LJzM0hFdgAaVzuvvdfN1MFhPAvBEg8LMgxARXnN2s0AVm9vrx2OSTswe/96w8K5zgDuDcG7n8c5d+UOK/K9+LxTlM1jYQ2OkO0XLvwcBVj16ccfvW8GwqYVWPT8EmFlvvPVn7+qdPUo3/REOXt5cOoJo1lYk+di5WILYFFUPK1GVesBNq5J7tjl5YIAqnEKFnucTUpLfJR2lCbGq2q9C6HSCOQvSA5g+VLhnX0WkWgWC7Mc3m1dFhihMNfCCMSh0iD0xxV6epN/IWUHcB4cIBKDuPL9bzHiCiL0G1HtBDj7tTISmcphhhoYZjiinP4uDIDG6ZSXt+ye45bINSDL54XKIiE303k5HgxNvQEDPojcH+Fab5jz16IMhRXgplsjhaKqbNi2s8il8olC8VRm/9T40yw5/RCPaWtXZ8eP4w+TUCjkvjUQXY3oCkECTlxU1XWrvy/qNGpc+dNo/OrDgbvfdnd3R2Aaj9Mnrb8A0TtykI+7cqgAAAAASUVORK5CYII=";
+		
+	/**
+     * Check CA ssl certificate is trusted in MacOS 
+     *
+     * @param 
+     * @return 
+     */
 	public static Boolean checkCACert() {
 		try {
 			KeyStore ks = KeyStore.getInstance("KeychainStore");
@@ -48,26 +62,28 @@ public class Configuration {
 				Certificate certificate = ks.getCertificate(alias);
 				X509Certificate x509 = (X509Certificate) certificate;
 				if (x509.getSerialNumber().toString(16).trim().toLowerCase()
-						.equals(SSL_CA_SERIAL)) {
+						.equals(Utils.getCertSslSerial())) {
 					return true;
 				}
 			}
 		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.write("Configuration", e.getMessage());
 		} catch (CertificateException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.write("Configuration", e.getMessage());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.write("Configuration", e.getMessage());
 		} catch (KeyStoreException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.write("Configuration", e.getMessage());
 		}
 		return false;
 	}
 
+	/**
+     * Execute command line in MacOS 
+     *
+     * @param command line
+     * @return 
+     */
 	public static void ExecuteCmd(String cmd) {
 		try {
 			String[] argss = new String[] { "/bin/bash", "-c", cmd };
@@ -78,6 +94,13 @@ public class Configuration {
 		}
 	}
 
+	/**
+     * get md5 hash of file 
+     *
+     * @param command line
+     * @return 
+     */
+	 //reference: https://stackoverflow.com/questions/304268/getting-a-files-md5-checksum-in-java
 	public static byte[] createChecksum(String filename) throws Exception {
 		InputStream fis = new FileInputStream(filename);
 
@@ -96,8 +119,13 @@ public class Configuration {
 		return complete.digest();
 	}
 
-	// see this How-to for a faster way to convert
-	// a byte array to a HEX string
+	/**
+     * get md5 hash of file 
+     *
+     * @param command line
+     * @return 
+     */
+	// reference: https://stackoverflow.com/questions/304268/getting-a-files-md5-checksum-in-java
 	public static String getMD5Checksum(String filename) throws Exception {
 		byte[] b = createChecksum(filename);
 		String result = "";
@@ -107,15 +135,19 @@ public class Configuration {
 		}
 		return result;
 	}
-	//
+
+	/**
+     * FFConfig: add ssl certificate into firefox' trusted store 
+     *
+     * @param 
+     * @return 
+     */
 	public static void FFConfig() {
 		try {
 			if (Utils.checkFirefoxConfig() != 1)
 			{
-				LOG.write("Main", "Configuring Firefox Browser");
+				LOG.write("FFConfig", "Configuring Firefox Browser");
 				String libraryPath = System.getProperty("user.home");
-				// /Users/trantuan/Library/Application
-				// Support/Firefox/Profiles/nd6j60vh.default
 				Path path = Paths.get(libraryPath, "Library",
 						"Application Support", "Firefox", "Profiles");
 				File[] directories = new File(path.toString())
@@ -135,7 +167,7 @@ public class Configuration {
 							String dbFileSum = getMD5Checksum(dbFile);
 							String dbConfigFileSum = getMD5Checksum(dbConfigFile);
 							if (!dbFileSum.equals(dbConfigFileSum)) {
-								LOG.write("Main", "Configuring db");
+								LOG.write("FFConfig", "Configuring db");
 								if (checkFirefoxRunning()) {
 									showWarningFirefoxRunning();
 								}
@@ -161,19 +193,25 @@ public class Configuration {
 				}
 			}
 		} catch (Exception ex) {
-			LOG.write("Main", ex.getMessage());
+			LOG.write("FFConfig", ex.getMessage());
 		}
 	}
+	
+	/**
+     * SafariConfig: add ssl certificate into Chrome and Safari' trusted store 
+     *
+     * @param 
+     * @return 
+     */
 	public static void SafariConfig() {
 		try {
-			String certCAPath = Paths.get(com.tokensigning.utils.Utils.getCertificateFolder(), "localhost.cer").toString();		
-			// config Safari and Chrome
-			LOG.write("Main", "Configuring Chrome and Safari Browser");
+			String certCAPath = Paths.get(com.tokensigning.utils.Utils.getCertificateFolder(), "localhost.cer").toString();	
+			LOG.write("SafariConfig", "Configuring Chrome and Safari Browser");
 			if (!Configuration.checkCACert())
 			{
 				final JFrame frame = new JFrame("Configuration");		
 				frame.setAlwaysOnTop(true);
-				ImageIcon icon = new ImageIcon(Base64Utils.base64Decode(ICON_WARNING));
+				ImageIcon icon = new ImageIcon(Base64Utils.base64Decode(IconLoader.getIconWarning()));
 				int result = JOptionPane.showConfirmDialog(frame, LanguageOption.CLOSE_BROWSER, LanguageOption.WARNING_CAPTION,
 						JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, icon);
 				
@@ -184,7 +222,7 @@ public class Configuration {
 				}
 				File fCertCA = new File(certCAPath);
 				if (!fCertCA.exists() || fCertCA.isDirectory()) {
-					LOG.write("Main", "Not found trusted ca: " + certCAPath);
+					LOG.write("SafariConfig", "Not found trusted ca: " + certCAPath);
 					PINVerification.showErrorMessage(LanguageOption.WARNING_INSTALL_FALIED);
 					return;
 				}
@@ -194,22 +232,46 @@ public class Configuration {
 				Configuration.ExecuteCmd(commandAddLogin);				
 			}
 		} catch (Exception ex) {
-			LOG.write("Main", ex.getMessage());
+			LOG.write("SafariConfig", ex.getMessage());
 		}
 	}
-	//
+
+	/**
+     * Check firefox is running
+     *
+     * @param 
+     * @return 
+     */
 	public static Boolean checkFirefoxRunning() {
 		return checkBrowserRunning("firefox", "firefox.app");
 	}
 	
+	/**
+     * Check Safari is running
+     *
+     * @param 
+     * @return 
+     */
 	public static Boolean checkSafariRunning() {
 		return checkBrowserRunning("Safari", "safari.app");
 	}
 	
+	/**
+     * Check Chrome is running
+     *
+     * @param 
+     * @return 
+     */
 	public static Boolean checkChromeRunning() {
 		return checkBrowserRunning("Google Chrome", "google chrome.app");
 	}
 	
+	/**
+     * Check app is running
+     *
+     * @param 
+     * @return 
+     */
 	public static Boolean checkBrowserRunning(String name, String appName) {
 		try {
 			String getPID = "ps aux|grep \"" + name+  "\"";
@@ -229,11 +291,18 @@ public class Configuration {
 		}
 		return false;
 	}
+	
+	/**
+     * Show warning
+     *
+     * @param 
+     * @return 
+     */
 	public static void showWarningFirefoxRunning()
 	{
 		final JFrame frame = new JFrame("Configuration");	
 		frame.setAlwaysOnTop(true);
-		ImageIcon icon = new ImageIcon(Base64Utils.base64Decode(ICON_WARNING));
+		ImageIcon icon = new ImageIcon(Base64Utils.base64Decode(IconLoader.getIconWarning()));
 		int result = JOptionPane.showConfirmDialog(frame, LanguageOption.CLOSE_FIREFOX, LanguageOption.WARNING_CAPTION,
 				JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, icon);
 		
@@ -242,50 +311,13 @@ public class Configuration {
 			ExecuteCmd(killFirefoxProcess);			
 		}
 	}
-	public String unobfuscate(String s) {
-		String key = "Zx" + Math.log(2) / 3;
-        char[] result = new char[s.length()];
-        for (int i = 0; i < s.length(); i++) {
-            result[i] = (char) (s.charAt(i) - key.charAt(i % key.length()));
-        }
-        return new String(result);
-    }
-    final static int feistelRounds = 4;
-    final static int randRounds = 4;
-    final static int seed = 12345;
-    private static int f (int x) {
-        final int a = 12+1;
-        final int c = 1361423303;
-        x = (x + seed) % mod;
-        int r = randRounds;
-        while (r-- != 0) {
-            x = (a*x+c) % mod;
-        }
-        return x;
-    }
-    final static int mod = 60466176;
-	public static int illuminate (String s) {
-        int a = Integer.valueOf(s.substring(0,5),36);
-        int b = Integer.valueOf(s.substring(5,10),36);
-        int r = feistelRounds;
-        while (r-- != 0) {
-            b = (b - f(a)) % mod;
-            a = (a - f(b)) % mod;
-        }
-        // make the modulus positive:
-        a = (a + mod)%mod;
-        b = (b + mod)%mod;
-
-        return a*mod+b;
-    }
-	public static String password(String s) {
-        int iPass = illuminate(s);
-        char[] passExtend = {'I', 'V', 'A', 'N', '2', '0', '1', '8', 'a', '@', 'A'};
-        String pwd = Integer.toString(iPass).concat(String.valueOf(passExtend));
-        return pwd;
-    }
 	
-	//
+	/**
+     * Show warning restart browser
+     *
+     * @param 
+     * @return 
+     */
 	public static void ShowRestartBrowserRequired() {
 		if (Utils.checkConfigFirtTime() != 1) {
 			OSType osType = Utils.getOperatingSystemType();
@@ -305,6 +337,13 @@ public class Configuration {
 			}
 		}
 	}
+	
+	/**
+     * Show warning restart browser
+     *
+     * @param 
+     * @return 
+     */
 	public static void ShowRestartBrowserMacOS()
 	{
 		if (checkSafariRunning() || checkChromeRunning()
@@ -312,7 +351,7 @@ public class Configuration {
 			final JFrame frame = new JFrame("Configuration");
 			frame.setAlwaysOnTop(true);
 			ImageIcon icon = new ImageIcon(
-					Base64Utils.base64Decode(ICON_WARNING));
+					Base64Utils.base64Decode(IconLoader.getIconWarning()));
 			int result = JOptionPane.showConfirmDialog(frame,
 					LanguageOption.CLOSE_BROWSER, LanguageOption.WARNING_CAPTION,
 					JOptionPane.OK_CANCEL_OPTION,
@@ -333,6 +372,12 @@ public class Configuration {
 			Utils.setConfigFirtTime();
 		}
 	}
+	/**
+     * Show warning restart browser
+     *
+     * @param 
+     * @return 
+     */
 	public static void ShowRestartBrowserWindows() {
 		
 	}
@@ -340,7 +385,12 @@ public class Configuration {
 		
 	}
 
-	//
+	/**
+     * Config browser with OS
+     *
+     * @param 
+     * @return 
+     */
 	public static void ConfigBrowsers() {
 		OSType osType = Utils.getOperatingSystemType();
 		

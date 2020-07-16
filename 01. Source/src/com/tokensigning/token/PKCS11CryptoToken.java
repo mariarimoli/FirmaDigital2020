@@ -25,10 +25,15 @@ import com.tokensigning.common.CertificateFilter;
 import com.tokensigning.common.LOG;
 import com.tokensigning.form.CertificateInfo;
 
+
 /**
- * @author Tuan Tran
- *
- */
+* PKCS11CryptoToken: keystore use pkcs#11 standard
+*
+* @author  Tuan
+* @version 1.0
+* @since   2020-07-12 
+*/
+
 public class PKCS11CryptoToken implements IKeystoreBase {
 		
 	private final KeyStorePKCS11CryptoToken delegate;	
@@ -39,11 +44,20 @@ public class PKCS11CryptoToken implements IKeystoreBase {
 	}
     private TOKEN_STATUS _tkStatus = TOKEN_STATUS.TOKEN_UNINITIALIZED;
     
+    
+    /**
+     * check token login or not use Pkcs#11 standard
+     *
+     * @param 
+     * @return TOKEN_STATUS
+     */
     public TOKEN_STATUS checkTokenStatus()
     {
     	return this._tkStatus;
     }
+    
 	/**
+	 * init pkcs#11 keystore
 	 * @param providerPkcs11
 	 * @param slotLabelValue
 	 * @param PIN
@@ -103,12 +117,19 @@ public class PKCS11CryptoToken implements IKeystoreBase {
         return false;
     }
 	
+	 /**
+     * get token init or not
+     *
+     * @param 
+     * @return true or false
+     */
 	public Boolean getTokenStatus()
 	{
 		return (delegate.getTokenStatus() == 1);
 	}
     
     /**
+     * Get private key use pkcs#11
      * @param alias
      * @return
      * @throws CryptoTokenOfflineException
@@ -121,12 +142,17 @@ public class PKCS11CryptoToken implements IKeystoreBase {
         }
     }
     
+    /**
+     * Get provider name
+     *
+     */
     public String getProvider()
     {
     	return delegate.getSignProviderName();
     }
     
     /**
+     * Get public key use pkcs#11
      * @param alias
      * @return
      * @throws CryptoTokenOfflineException
@@ -148,6 +174,7 @@ public class PKCS11CryptoToken implements IKeystoreBase {
     }
 
     /**
+     * Get certificate use pkcs#11
      * @param alias
      * @return
      * @throws CryptoTokenOfflineException
@@ -164,6 +191,7 @@ public class PKCS11CryptoToken implements IKeystoreBase {
     }
     
     /**
+     * Get certificate chain use pkcs#11
      * @param alias
      * @return
      * @throws CryptoTokenOfflineException
@@ -182,6 +210,7 @@ public class PKCS11CryptoToken implements IKeystoreBase {
     	return null;
     }
     /**
+     * Get certificate alias
      * @param serialNumber
      * @return
      * @throws CryptoTokenOfflineException
@@ -208,7 +237,14 @@ public class PKCS11CryptoToken implements IKeystoreBase {
 		}
     	return null;
     }   
-    public List<CertificateInfo> getAllCertificateInfo() throws CryptoTokenOfflineException
+    
+    /**
+     * Get certificate information
+     * 
+     * @return
+     * @throws CryptoTokenOfflineException
+     */
+    public List<CertificateInfo> getAllCertInfoFromUserstore() throws CryptoTokenOfflineException
     {
     	List<CertificateInfo> certs = new ArrayList<CertificateInfo>();
     	try {
@@ -245,6 +281,12 @@ public class PKCS11CryptoToken implements IKeystoreBase {
 		}
     	return certs;
     }
+    
+    /**
+     * Logout token session
+     * 
+     * @return
+     */
     public void logoutSession()
     {
     	try
@@ -258,6 +300,7 @@ public class PKCS11CryptoToken implements IKeystoreBase {
     }
            
    	/**
+   	 * KeyStorePKCS11CryptoToken is pkcs11 keystore
 	 * @author Tuan Tran
 	 *
 	 */
@@ -283,11 +326,31 @@ public class PKCS11CryptoToken implements IKeystoreBase {
 		}
 	}
 
+	 /**
+     * Get certificates list
+     * 
+     * @param certFilter is conditions to filter
+     * @return
+     * @throws CryptoTokenOfflineException
+     */
 	@Override
 	public List<CertificateInfo> getAllCertificateInfo(CertificateFilter certFilter)
 			throws CryptoTokenOfflineException {
 		if (certFilter == null)
-			return getAllCertificateInfo();
+			return getAllCertInfoFromUserstore();
+		return null;
+	}
+	
+	/**
+     * Get certificates chain
+     * 
+     * @param serialNumber
+     * @return
+     * @throws CryptoTokenOfflineException
+     */
+	@Override
+	public Certificate[] getCertificateChainBySerial(String serialNumber) throws CryptoTokenOfflineException {
+		// TODO Auto-generated method stub
 		return null;
 	}
 }

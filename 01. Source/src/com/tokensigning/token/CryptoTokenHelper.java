@@ -1,10 +1,6 @@
 package com.tokensigning.token;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -14,31 +10,50 @@ import java.util.Properties;
 
 import org.cesecore.keys.token.p11.Pkcs11SlotLabelType;
 
+import com.tokensigning.common.LOG;
 import com.tokensigning.common.OSType;
 import com.tokensigning.utils.Utils;
 
+/**
+* CryptoTokenHelper: pkcs#11 configuration
+*
+* @author  Tuan
+* @version 1.0
+* @since   2020-07-12 
+*/
+
 public class CryptoTokenHelper {
 
-	public static final int MAX_SLOT = 10;
-
+	// Define max slot in computer
+	public static final int MAX_SLOT = 5;
+	// Attributes temp file init token
 	public static final String PROPERTY_ATTRIBUTESFILE = "ATTRIBUTESFILE";
+	// Attributes init token
 	public static final String PROPERTY_ATTRIBUTES = "ATTRIBUTES";
+	// Slot list index
 	public static final String PROPERTY_SLOTLISTINDEX = "SLOTLISTINDEX";
+	// Slot
 	public static final String PROPERTY_SLOT = "SLOT";
+	// Pkcs#11 driver
 	public static final String PROPERTY_SHAREDLIBRARY = "SHAREDLIBRARY";
+	// Usb token PIN
 	public static final String PROPERTY_PIN = "PIN";
+	// Key alias
 	public static final String PROPERTY_DEFAULTKEY = "DEFAULTKEY";
+	// Authen code
 	public static final String PROPERTY_AUTHCODE = "AUTHCODE";
+	// Slot type: index, label
 	public static final String PROPERTY_SLOTLABELTYPE = "SLOTLABELTYPE";
+	// Slot label value
 	public static final String PROPERTY_SLOTLABELVALUE = "SLOTLABELVALUE";
-	
+	// Folder store Pkcs#11 drivers in MacOS
 	public static final String PROVIDER_FOLDER = "/usr/local/lib";
-	
-	
+	// Temporary pkcs#11 driver
 	public static String PKCS11_PROVIDER_LIST = "vnptca_p11_v8.dll";
 
 	/**
-	 * @param props
+	 * Fix pkcs#11 properties
+	 * @param props is pkcs#11 properties
 	 * @return
 	 */
 	public static Properties fixP11Properties(final Properties props) {
@@ -97,32 +112,23 @@ public class CryptoTokenHelper {
 		}
 		return props;
 	}
-
+	/**
+	 * Get config max slot
+	 * @return
+	 */
 	public static int getMaxSlot() {
-		try {
-			Properties prop = new Properties();
-
-			InputStream input;
-			// load a properties file
-			String configFile = Utils.getAppConfig();
-			File f = new File(configFile.toString());
-			if (f.exists() && !f.isDirectory()) {
-				input = new FileInputStream(configFile.toString());
-				prop.load(input);
-				if (null != prop && null != prop.getProperty("max_slot")) {
-					return Integer.parseInt(prop.getProperty("max_slot"));
-				}
-			}
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		String maxSlot = Utils.getValueFromConfig("max_slot");
+		if (maxSlot == null || maxSlot.isEmpty())
+		{
+			return MAX_SLOT;
 		}
-		return MAX_SLOT;
+		return Integer.parseInt(maxSlot);
 	}
 
+	/**
+	 * Get all pkcs#11 driver on system 
+	 * @return list pkcs#11 driver
+	 */
 	public static List<String> getProviderExist() {
 		List<String> providerExist = new ArrayList<String>();
 		try {
@@ -161,12 +167,15 @@ public class CryptoTokenHelper {
 			}
 			
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.write("CryptoTokenHelper", e.getMessage());
 		}
 		return providerExist;
 	}
 	
+	/**
+	 * Check driver is exist on system
+	 * @return driver full path
+	 */
 	public static String IsFileExistInSystem(String providerName) {
 		if (providerName == null || providerName.isEmpty())
 		{
@@ -200,6 +209,10 @@ public class CryptoTokenHelper {
 		}
 	}
 
+	/**
+	 * Get drivers is exist on system
+	 * @return list pkcs#11 driver
+	 */
 	public static List<String> GetDriverOnSystem() {
 		OSType osType = Utils.getOperatingSystemType();
 		switch (osType) {
@@ -215,7 +228,10 @@ public class CryptoTokenHelper {
 		
 	}
 	
-	
+	/**
+	 * Get drivers is exist on system MacOS
+	 * @return list pkcs#11 driver
+	 */
 	public static List<String> GetDriverOnMacOS() {
 		List<String> providerList = new ArrayList<String>();
 		File folder = new File(PROVIDER_FOLDER);
@@ -231,6 +247,10 @@ public class CryptoTokenHelper {
 		return providerList;
 	}
 	
+	/**
+	 * Get drivers is exist on system Windows
+	 * @return list pkcs#11 driver
+	 */
 	public static List<String> GetDriverOnWindows() {
 		List<String> providerList = new ArrayList<String>();
 		String folderDriver = System.getenv("WINDIR") + "\\system32";

@@ -10,6 +10,14 @@ import java.util.Set;
 
 import com.tokensigning.common.LOG;
 
+/**
+* LanguageOption: language configuration
+*
+* @author  Tuan
+* @version 1.0
+* @since   2020-07-12 
+*/
+
 public class LanguageOption {	
 	// Config install
 	public static String WARNING_CAPTION = "Warning";
@@ -41,7 +49,11 @@ public class LanguageOption {
 	public static String LANGUAGE_DIALOG = "Language";
 	public static String LANGUAGE_DIALOG_REQUEST = "Choose language:";
 	public static String LANGUAGE_DIALOG_CAPTION = "Language";
-	//
+
+	/**
+     * Constructor
+     *
+     */
 	public LanguageOption()
 	{
 		String fileLang = Utils.getCurrentLanguage();
@@ -51,9 +63,14 @@ public class LanguageOption {
 		}
 	}
 	
+	
+	/**
+     * Constructor
+     *
+     * @param langConfig is language config (spa or por)
+     */
 	public LanguageOption(String langConfig)
 	{
-		//String fileLang = Utils.getCurrentLanguage();
 		String configFolder = Utils.getConfigFolder();
 		String langFile = Paths.get(configFolder.trim(), "Language", langConfig + ".lg").toString();
 		if (langFile != null)
@@ -62,32 +79,37 @@ public class LanguageOption {
 		}
 	}
 	
+	/**
+     * Update label, text from language configuration file
+     *
+     * @param fileConfig is path to file configuration (spa or por)
+     */
 	public void updateLanguage(String fileConfig)
 	{
 		Hashtable<String, String> hashLang = getLanguage(fileConfig);
 		Set<String> keys = hashLang.keySet();
         for(String key: keys){
-            //System.out.println("Value of "+key+" is: "+hashLang.get(key));
             try {
-				//Field field = this.getClass().getField(key);
             	Field field = this.getClass().getDeclaredField(key);
 				field.set(this, hashLang.get(key));
 			} catch (NoSuchFieldException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOG.write("LanguageOption", e.getMessage());
 			} catch (SecurityException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOG.write("LanguageOption", e.getMessage());
 			} catch (IllegalArgumentException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOG.write("LanguageOption", e.getMessage());
 			} catch (IllegalAccessException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOG.write("LanguageOption", e.getMessage());
 			}
         }
 	}
 	
+	
+	/**
+     * Load label, text from language configuration file
+     *
+     * @param fileConfig is path to file configuration (spa or por)
+     */
 	public Hashtable<String, String> getLanguage(String fileConfig)
 	{
 		Hashtable<String, String> hashLang = new Hashtable<>();

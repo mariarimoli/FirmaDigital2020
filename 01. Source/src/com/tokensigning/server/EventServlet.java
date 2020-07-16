@@ -3,19 +3,30 @@ package com.tokensigning.server;
 import org.eclipse.jetty.websocket.servlet.WebSocketServlet;
 import org.eclipse.jetty.websocket.servlet.WebSocketServletFactory;
 
-@SuppressWarnings("serial")
+import com.tokensigning.utils.Utils;
+
+/**
+* EventServlet: Websocket server config
+*
+* @author  Tuan
+* @version 1.0
+* @since   2020-07-12 
+*/
+
 public class EventServlet extends WebSocketServlet
 {
-	private static final int MAX_SIZE = 100 * 1024 * 1024;
-    @Override
+	private static final long serialVersionUID = 1L;
+
+	@Override
     public void configure(WebSocketServletFactory factory)
     {
-    	factory.getPolicy().setIdleTimeout(15000);
-    	factory.getPolicy().setMaxBinaryMessageBufferSize(MAX_SIZE);
-    	factory.getPolicy().setMaxBinaryMessageSize(MAX_SIZE);
+    	int maxSize = Utils.getServerMaxSize();
+    	factory.getPolicy().setIdleTimeout(Utils.getServerTimeout());
+    	factory.getPolicy().setMaxBinaryMessageBufferSize(maxSize);
+    	factory.getPolicy().setMaxBinaryMessageSize(maxSize);
     	
-    	factory.getPolicy().setMaxTextMessageSize(MAX_SIZE);
-    	factory.getPolicy().setMaxTextMessageBufferSize(MAX_SIZE);
+    	factory.getPolicy().setMaxTextMessageSize(maxSize);
+    	factory.getPolicy().setMaxTextMessageBufferSize(maxSize);
         factory.register(EventSocket.class);
     }    
     

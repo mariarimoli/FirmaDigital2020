@@ -17,16 +17,30 @@ import com.tokensigning.license.LicenseKey;
 import com.tokensigning.token.CertificateHandle;
 import com.tokensigning.utils.Utils;
 
+/**
+* EventSocket: handle request from webclient
+*
+* @author  Tuan
+* @version 1.0
+* @since   2020-07-12 
+*/
+
+
 public class EventSocket extends WebSocketAdapter
 {
-	//TODO can check khi co nhieu ket noi toi thi session co bi anh huong hay khong?
-	//TODO setup ssl nhu the nao?
 	public static String _domainConnect = null;
 	public static String _domainWithoutHttp = null;
 	private Session sess;
-	public static final String APP_VERSION = "1.0.0.2";
+	
 	private static final Gson _gson = new GsonBuilder().disableHtmlEscaping().create();
-    @Override
+    
+	/**
+     * Method used when open connection
+     *
+     * @param Session
+     * @return
+     */	
+	@Override    
     public void onWebSocketConnect(Session sess)
     {
         super.onWebSocketConnect(sess);
@@ -41,6 +55,13 @@ public class EventSocket extends WebSocketAdapter
         this.sess = sess;
     }
     
+
+	/**
+     * Method used handle message received from webclient
+     *
+     * @param message from webclient
+     * @return
+     */	
     @Override
 	public void onWebSocketText(String message) {
 		super.onWebSocketText(message);
@@ -108,6 +129,12 @@ public class EventSocket extends WebSocketAdapter
 		}
     }
     
+    /**
+     * Method used when close socket
+     *
+     * @param
+     * @return
+     */	
     @Override
     public void onWebSocketClose(int statusCode, String reason)
     {
@@ -115,21 +142,30 @@ public class EventSocket extends WebSocketAdapter
         System.out.println("Socket Closed: [" + statusCode + "] " + reason);
     }
     
+    /**
+     * Method used when handle error
+     *
+     * @param message from webclient
+     * @return
+     */	
     @Override
     public void onWebSocketError(Throwable cause)
     {
         super.onWebSocketError(cause);
-        //cause.printStackTrace(System.err);
     }
     
+    /**
+     * Method used when send message to webclient
+     *
+     * @param message is response from TokenSigning
+     * @return
+     */	
     private void sendMessageToBrowser(String message)
     {
     	try {
-    		//LOG.write("Main.Return", message);
 			sess.getRemote().sendString(message);
 			
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			LOG.write("Main.Return", e.getMessage());
 		}
     }

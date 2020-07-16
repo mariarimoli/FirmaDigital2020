@@ -1,13 +1,23 @@
 package com.tokensigning.common;
 
+/**
+* Connector: object define request from webclient to TokenSigning
+*
+* @author  Tuan
+* @version 1.0
+* @since   2020-07-12 
+*/
+
 public class Connector {
 	public Connector(int functionID, String[] args) {
 		this.functionID = functionID;
 		this.args = args;
 	}
-	//
+	// id of function. see more: enum FUNCTION_ID
 	private int functionID;
+	// parameters
 	private String[] args;
+	// key: license key
 	private String key;
 	
 	///

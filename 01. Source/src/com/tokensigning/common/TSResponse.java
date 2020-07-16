@@ -1,9 +1,20 @@
 package com.tokensigning.common;
 
+/**
+* DataResult: object define response from TokenSigning to Webclient
+*
+* @author  Tuan
+* @version 1.0
+* @since   2020-07-12 
+*/
+
 public class TSResponse
 {
+	// Error code
     private int code;
+    // Data: json string 	
     private String data;
+    // Error: error description
     private String error;
     
     

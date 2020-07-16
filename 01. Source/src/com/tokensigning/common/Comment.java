@@ -1,5 +1,13 @@
 package com.tokensigning.common;
 
+/**
+* Comment: object define a comment in pdf file
+*
+* @author  Tuan
+* @version 1.0
+* @since   2020-07-12 
+*/
+
 public class Comment {
 	public Comment() { }
 
@@ -8,10 +16,11 @@ public class Comment {
     public int lly ;
     public int urx ;
     public int ury ;
-    public String Description ;
-    public Boolean OnlyDescription ;
-    public Boolean commentItalic = false;
-    public int commentFontSize = 14;
+    public String 	Description ;
+    public Boolean 	OnlyDescription ;
+    public Boolean 	commentItalic = false;
+    public int 		commentFontSize = 14;
+    
 	public int getPage() {
 		return page;
 	}
